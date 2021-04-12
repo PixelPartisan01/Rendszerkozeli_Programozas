@@ -32,14 +32,11 @@ int main(int argc, char* argv[])
 
         Translate(titkos_uzenet, NumCh);
 
-        getchar();
-
         return 0;
     }
     else if(strcmp(argv[1],"--version") == 0)
     {
         printf("version: %s\nDate: 2021.04.05\nMade by: Varadi Sandor\n",ver);
-        getchar();
     }
     else if(strcmp(argv[1],"--help") == 0)
     {
@@ -47,7 +44,6 @@ int main(int argc, char* argv[])
         printf("--help\t\t\tPossible Arguments\n");
         printf("Other arguments\t\tFile name\n");
         printf("No arguments\t\tFile browser\n");
-        getchar();
     }
     else
     {
@@ -64,7 +60,6 @@ int main(int argc, char* argv[])
 
         fclose(file);
 
-        getchar();
     }
     return 0;
 }

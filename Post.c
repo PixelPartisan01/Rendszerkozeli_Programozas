@@ -54,7 +54,6 @@ int Post(char *NeptunId , char *message, int NumCh)
 	    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
 		puts("Connect Error");
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-		getchar();
 		exit(1);
 	}
 
@@ -63,7 +62,7 @@ int Post(char *NeptunId , char *message, int NumCh)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 
 	//Send some data
-    sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\r\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\nNeptunID=%s&PostedText=%s", (NumCh+27), NeptunId, message);
+    sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\r\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh+27), NeptunId, message);
 
     printf("\n%s\n", buffer);
 	if( send(s , buffer , strlen(buffer) , 0) < 0)
@@ -71,7 +70,6 @@ int Post(char *NeptunId , char *message, int NumCh)
 	    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
 		puts("Send failed");
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-		getchar();
 		exit(1);
 	}
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
@@ -84,7 +82,6 @@ int Post(char *NeptunId , char *message, int NumCh)
 	    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
 		puts("Recv Failed");
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-		getchar();
 		exit(1);
 	}
 
@@ -106,7 +103,6 @@ int Post(char *NeptunId , char *message, int NumCh)
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4+15*16 | FOREGROUND_INTENSITY);
         puts(server_reply);
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-        getchar();
         exit(1);
     }
 
