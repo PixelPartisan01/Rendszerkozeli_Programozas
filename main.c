@@ -18,7 +18,7 @@ int BrowseForOpen();
 char* ReadPixels(int f, int* NumCh);
 char* Unwrap(char* Pbuff, int NumCh);
 void Translate (char *titkos_uzenet, int NumCh);
-int Post(char *NeptunId , char *message, int NumCh);
+void Post(char *NeptunId , char *message, int NumCh);
 
 int main(int argc, char* argv[])
 {
@@ -288,7 +288,7 @@ char* Unwrap(char* Pbuff, int NumCh)
     return kod;
 }
 
-int Post(char *NeptunId , char *message, int NumCh)
+void Post(char *NeptunId , char *message, int NumCh)
 {
     int s;                            // socket ID
     int bytes;                        // received/sent bytes
@@ -316,6 +316,8 @@ int Post(char *NeptunId , char *message, int NumCh)
         exit(2);
     }
 
+    printf("Socket created.\n\n");
+
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on);
     setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof on);
 
@@ -327,13 +329,11 @@ int Post(char *NeptunId , char *message, int NumCh)
         exit(3);
     }
 
-    printf(" Connection is OK.\n");
-
-    printf(" Message to send: ");
+    printf("Connected.\n\n");
     
-    sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\r\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh+27), NeptunId, message);
+    sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh+27), NeptunId, message);
 
-    printf("\n\n%s\n", buffer);
+    printf("%s\n\n", buffer);
 
     bytes = send(s, buffer, strlen(buffer)+1, flag);
 
@@ -342,35 +342,34 @@ int Post(char *NeptunId , char *message, int NumCh)
         fprintf(stderr, " %s: Sending error.\n");
         exit(4);
     }
+
+    puts("Data Send\n");
     
     if( recv(s , server_reply , 2000 , 0) < 0)
 	{
-		puts("recv failed");	
-    	exit(1);
+		puts("recv failed\n");	
+    	exit(5);
 	}
     else if (strstr(server_reply, "The message has been received.") == NULL)
     {
-        printf("\n");
+        puts("Server Reply Error\n\n");
         puts(server_reply);
-        exit(1);
+        printf("\n");
+        exit(6);
     }
-
-    printf (" %i bytes have been sent to server.\n", bytes-1);
 
     bytes = recv(s, buffer, BUFSIZE, flag);
 
     if ( bytes < 0 ) 
     {
         fprintf(stderr, " %s: Receiving error.\n");
-        exit(5);
+        exit(7);
     }
 
     printf(" Server's (%s:%d) acknowledgement:\n  %s\n", inet_ntoa(server.sin_addr), ntohs(server.sin_port), buffer);
 
-    printf("\n");
+    puts("Server Reply:\n\n");
     puts(server_reply);
 
     close(s);
-
-    return EXIT_SUCCESS;
 }
