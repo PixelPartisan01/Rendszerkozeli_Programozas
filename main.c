@@ -4,8 +4,9 @@
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
-#include<time.h>
-#include<pwd.h>
+#include <time.h>
+#include <pwd.h>
+#include<omp.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
