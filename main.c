@@ -96,46 +96,42 @@ void Translate (char *titkos_uzenet, int NumCh)
 
 int BrowseForOpen()
 {
-    FILE *file;
-    DIR *d;
+    FILE* file;
+    DIR* d;
     char keres[1000] = "";
-    char konyvtar[1000] = ".";
-    struct dirent *entry;
+    char konyvtar[1001] = ".";
+    char elozo[1000] = "";
+    struct dirent* entry;
 
-
-    while(1)
+    while (1)
     {
         d = opendir(konyvtar);
 
-        printf("%s\n\n", konyvtar);
-        
-        if(!d)
+        if (!d)
         {
-            if(strstr(keres,".bmp"))
-            {
-                file = fopen(konyvtar, "rb");
-                int fn = fileno(file);
-                return fn;
-            }
-            else
-            {
-                strcat(konyvtar, "/..");
-            }
+            strcpy(konyvtar, elozo);
+            system("clear");
         }
         else
         {
-            while((entry=readdir(d))!=NULL)
+            while ((entry = readdir(d)) != NULL)
             {
-                printf("%s\n",(*entry).d_name);
+                if ((*entry).d_name[0] != '.')
+                    printf("%s\n", (*entry).d_name);
             }
 
             closedir(d);
-            
+
             printf("\n\nSearch: ");
-            scanf("%s",keres);
+            scanf("%s", keres);
+
+            strcpy(elozo, konyvtar);
 
             strcat(konyvtar, "/");
             strcat(konyvtar, keres);
+
+            system("clear");
+
         }
     }
 }
