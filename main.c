@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     }
     else if(strcmp(argv[1],"--version") == 0)
     {
-        printf("version: %s\nDate: 2021.04.12\nMade by: Varadi Sandor\n",ver);
+        printf("version: %s\nDate: 2021.04.13\nMade by: Varadi Sandor\n",ver);
     }
     else if(strcmp(argv[1],"--help") == 0)
     {
@@ -312,7 +312,7 @@ void Post(char *NeptunId , char *message, int NumCh)
     
     if ( s < 0 ) 
     {
-        fprintf(stderr, " %s: Socket creation error.\n");
+        printf("Socket creation error.\n");
         exit(2);
     }
 
@@ -325,7 +325,7 @@ void Post(char *NeptunId , char *message, int NumCh)
 
     if ( err < 0 ) 
     {
-        fprintf(stderr, " %s: Connecting error.\n");
+        printf("Connecting error.\n");
         exit(3);
     }
 
@@ -339,7 +339,7 @@ void Post(char *NeptunId , char *message, int NumCh)
 
     if ( bytes <= 0 ) 
     {
-        fprintf(stderr, " %s: Sending error.\n");
+        printf("Sending error.\n");
         exit(4);
     }
 
@@ -362,7 +362,7 @@ void Post(char *NeptunId , char *message, int NumCh)
 
     if ( bytes < 0 ) 
     {
-        fprintf(stderr, " %s: Receiving error.\n");
+        printf("Receiving error.\n");
         exit(7);
     }
 
