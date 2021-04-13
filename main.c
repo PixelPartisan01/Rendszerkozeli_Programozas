@@ -4,6 +4,8 @@
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
+#include<time.h>
+#include<pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
@@ -96,12 +98,16 @@ void Translate (char *titkos_uzenet, int NumCh)
 
 int BrowseForOpen()
 {
+    system("clear");
+
     FILE* file;
     DIR* d;
     char keres[1000] = "";
     char konyvtar[1001] = ".";
     char elozo[1000] = "";
     struct dirent* entry;
+    int tmp;
+    struct stat inode;
 
     while (1)
     {
@@ -109,6 +115,17 @@ int BrowseForOpen()
 
         if (!d)
         {
+            tmp = stat(konyvtar, &inode);
+
+            if(inode.st_mode & S_IFREG && strstr(konyvtar, ".bmp"))
+            {
+                system("clear");
+                file = fopen(konyvtar, "rb");
+                int fn = fileno(file);
+                return fn;
+            }
+            //else
+
             strcpy(konyvtar, elozo);
             system("clear");
         }
@@ -124,6 +141,16 @@ int BrowseForOpen()
 
             printf("\n\nSearch: ");
             scanf("%s", keres);
+
+            tmp = stat(keres, &inode);
+
+            if (inode.st_mode&S_IFREG && strstr(keres,".bmp"))
+            {
+                system("clear");
+                file = fopen(keres, "rb");
+                int fn = fileno(file);
+                return fn;
+            }
 
             strcpy(elozo, konyvtar);
 
@@ -304,7 +331,7 @@ int Post(char *NeptunId , char *message, int NumCh)
 
     printf(" Message to send: ");
     
-    sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh+27), NeptunId, message);
+    sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\r\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh+27), NeptunId, message);
 
     printf("\n\n%s\n", buffer);
 
@@ -340,6 +367,8 @@ int Post(char *NeptunId , char *message, int NumCh)
 
     printf(" Server's (%s:%d) acknowledgement:\n  %s\n", inet_ntoa(server.sin_addr), ntohs(server.sin_port), buffer);
 
+    printf("\n");
+    puts(server_reply);
 
     close(s);
 
