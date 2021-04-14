@@ -23,8 +23,7 @@ void Post(char *NeptunId , char *message, int NumCh);
 
 int main(int argc, char* argv[])
 {
-    char *ver = "0.4.2";
-
+    char *ver = "0.5.1";
     int NumCh = 0;
     char *titkos_uzenet = "";
     char *array = "";
@@ -43,13 +42,13 @@ int main(int argc, char* argv[])
     }
     else if(strcmp(argv[1],"--version") == 0)
     {
-        printf("version: %s\nDate: 2021.04.13\nMade by: Varadi Sandor\n",ver);
+        printf("version: %s\nDate: 2021.04.14\nMade by: Varadi Sandor\n",ver);
     }
     else if(strcmp(argv[1],"--help") == 0)
     {
         printf("--version\t\tVersion, Release Date, Author\n");
         printf("--help\t\t\tPossible Arguments\n");
-        printf("Other arguments\t\tFile name\n");
+        printf("Other arguments\t\tFile path\n");
         printf("No arguments\t\tFile browser\n");
 
         return 0;
@@ -58,6 +57,12 @@ int main(int argc, char* argv[])
     {
         FILE *file;
         file = fopen(argv[1], "rb");
+
+        if (!file)
+        {
+            puts("\nWrong FILE path!\n");
+            exit(1);
+        }
 
         int fn = fileno(file);
 
@@ -250,7 +255,7 @@ char* Unwrap(char* Pbuff, int NumCh)
     for(int i = 0; i < 24*NumCh; i+=8)
     {
         #pragma omp critical // ??????????????
-
+        
         for(int i = 0; i < 8; i++)
         {
             reszlet[i] = Pbuff[Pbuff_index+i];
@@ -289,6 +294,7 @@ char* Unwrap(char* Pbuff, int NumCh)
 
             rgb = 1;
         }
+
     }
 
     free(Pbuff);
