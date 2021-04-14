@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <pwd.h>
-#include<omp.h>
+#include <omp.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
@@ -51,6 +51,8 @@ int main(int argc, char* argv[])
         printf("--help\t\t\tPossible Arguments\n");
         printf("Other arguments\t\tFile name\n");
         printf("No arguments\t\tFile browser\n");
+
+        return 0;
     }
     else
     {
@@ -67,8 +69,8 @@ int main(int argc, char* argv[])
 
         fclose(file);
 
+        return 0;
     }
-    return 0;
 }
 
 void Translate (char *titkos_uzenet, int NumCh)
@@ -228,6 +230,7 @@ char* ReadPixels(int f, int* NumCh)
     }
 }
 
+
 char* Unwrap(char* Pbuff, int NumCh)
 {
     char *kod = (char*)malloc(NumCh*8);
@@ -242,8 +245,12 @@ char* Unwrap(char* Pbuff, int NumCh)
     char reszlet[8];
     int rgb = 1;
 
+
+    #pragma omp parallel for
     for(int i = 0; i < 24*NumCh; i+=8)
     {
+        #pragma omp critical // ??????????????
+
         for(int i = 0; i < 8; i++)
         {
             reszlet[i] = Pbuff[Pbuff_index+i];
