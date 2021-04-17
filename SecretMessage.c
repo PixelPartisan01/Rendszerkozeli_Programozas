@@ -174,7 +174,6 @@ char* ReadPixels(int f, int* NumCh)
     }
 }
 
-
 char* Unwrap(char* Pbuff, int NumCh)
 {
     char* kod = (char*)malloc(NumCh * 8);
@@ -190,10 +189,10 @@ char* Unwrap(char* Pbuff, int NumCh)
     int rgb = 1;
 
 
-#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < 24 * NumCh; i += 8)
     {
-#pragma omp critical // ??????????????
+        #pragma omp critical
 
         for (int i = 0; i < 8; i++)
         {
@@ -265,7 +264,7 @@ void Post(char* NeptunId, char* message, int NumCh)
 
     if (s < 0)
     {
-        printf("Socket creation error.\n");
+        printf("Socket creation error!\n");
         exit(2);
     }
 
@@ -278,7 +277,7 @@ void Post(char* NeptunId, char* message, int NumCh)
 
     if (err < 0)
     {
-        printf("Connecting error.\n");
+        printf("Connecting error!\n");
         exit(3);
     }
 
@@ -286,37 +285,29 @@ void Post(char* NeptunId, char* message, int NumCh)
 
     sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh + 27), NeptunId, message);
 
-    printf("%s\n\n", buffer);
+    //printf("%s\n\n", buffer);
 
     bytes = send(s, buffer, strlen(buffer) + 1, flag);
 
     if (bytes <= 0)
     {
-        printf("Sending error.\n");
+        printf("Sending error!\n");
         exit(4);
     }
 
-    puts("Data Send\n");
+    puts("Data Send.\n");
 
     if (recv(s, server_reply, 2000, 0) < 0)
     {
-        puts("recv failed\n");
+        puts("Recv failed!\n");
         exit(5);
     }
     else if (strstr(server_reply, "The message has been received.") == NULL)
     {
-        puts("Server Reply Error\n\n");
+        puts("Server Reply Error!\n\n");
         puts(server_reply);
         printf("\n");
         exit(6);
-    }
-
-    bytes = recv(s, buffer, BUFSIZE, flag);
-
-    if (bytes < 0)
-    {
-        printf("Receiving error.\n");
-        exit(7);
     }
 
     printf(" Server's (%s:%d) acknowledgement:\n  %s\n", inet_ntoa(server.sin_addr), ntohs(server.sin_port), buffer);

@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
         if (!file)
         {
-            puts("\nWrong FILE path!\n");
+            puts("\nFILE doesn't exist or wrong FILE path!\n");
             exit(1);
         }
 
