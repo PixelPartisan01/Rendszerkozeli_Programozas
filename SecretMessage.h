@@ -298,7 +298,7 @@ void Post(char* NeptunId, char* message, int NumCh)
 
     printf("Connected.\n\n");
 
-    sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh + 27), NeptunId, message);
+    sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\r\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh + 27), NeptunId, message);
 
     bytes = send(s, buffer, strlen(buffer) + 1, flag);
 
