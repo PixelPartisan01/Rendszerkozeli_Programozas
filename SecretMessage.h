@@ -1,3 +1,4 @@
+#pragma once
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,10 +13,21 @@
 #include <netinet/in.h>
 #include <linux/limits.h>
 #include <arpa/inet.h>
-#include "headers/SecretMessage.h"
+#include <unistd.h>
+#include <signal.h>
 
 #define BUFSIZE 1024 
 #define PORT_NO 80
+#define NEPTUN "HJTBVA"
+
+int BrowseForOpen();
+char* ReadPixels(int f, int* NumCh);
+char* Unwrap(char* Pbuff, int NumCh);
+void Translate (char *titkos_uzenet, int NumCh);
+void Post(char *NeptunId , char *message, int NumCh);
+void WhatToDo(int sig);
+void ctrlc();
+void stop();
 
 int BrowseForOpen()
 {
@@ -29,6 +41,7 @@ int BrowseForOpen()
     struct dirent* entry;
     int tmp;
     struct stat inode;
+    
 
     while (1)
     {
@@ -88,8 +101,6 @@ void Translate(char* titkos_uzenet, int NumCh)
 {
     int z = 0;
 
-    char* NEPTUN = "HJTBVA";
-
     char resz_string[9];
 
     char uzenet[NumCh + 1];
@@ -105,7 +116,7 @@ void Translate(char* titkos_uzenet, int NumCh)
         z += 8;
     }
 
-    //printf("%s", uzenet);
+    alarm(0);
 
     Post(NEPTUN, uzenet, NumCh);
 }
@@ -114,8 +125,12 @@ char* ReadPixels(int f, int* NumCh)
 {
     char* buffer;
     long length;
+    
 
     FILE* file = fdopen(f, "rb");
+    WhatToDo(SIGALRM);
+    WhatToDo(SIGINT);
+    alarm(1);
 
     if (!file)
     {
@@ -189,10 +204,10 @@ char* Unwrap(char* Pbuff, int NumCh)
     int rgb = 1;
 
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < 24 * NumCh; i += 8)
     {
-        #pragma omp critical
+#pragma omp critical
 
         for (int i = 0; i < 8; i++)
         {
@@ -268,7 +283,7 @@ void Post(char* NeptunId, char* message, int NumCh)
         exit(2);
     }
 
-    printf("Socket created.\n\n");
+    printf("\nSocket created.\n\n");
 
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on);
     setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof on);
@@ -284,8 +299,6 @@ void Post(char* NeptunId, char* message, int NumCh)
     printf("Connected.\n\n");
 
     sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh + 27), NeptunId, message);
-
-    //printf("%s\n\n", buffer);
 
     bytes = send(s, buffer, strlen(buffer) + 1, flag);
 
@@ -310,10 +323,37 @@ void Post(char* NeptunId, char* message, int NumCh)
         exit(6);
     }
 
-    printf(" Server's (%s:%d) acknowledgement:\n  %s\n", inet_ntoa(server.sin_addr), ntohs(server.sin_port), buffer);
+    printf("Server's (%s:%d) acknowledgement:\n  %s\n", inet_ntoa(server.sin_addr), ntohs(server.sin_port), buffer);
 
     puts("Server Reply:\n\n");
     puts(server_reply);
 
     close(s);
+}
+
+void WhatToDo(int sig)
+{
+    if(sig == SIGALRM)
+        signal(sig, stop);
+
+    if(sig == SIGINT)
+        signal(sig, ctrlc);        
+}
+
+void stop()
+{
+    fprintf(stderr, "\nProgram takes too long to run!\n");
+    exit(7);
+}
+
+void ctrlc()
+{
+    pid_t pid;
+    pid = fork();
+
+    if (pid != 0)
+    {
+        fprintf(stderr, "\nCTRL+C won't kill the program!\n");
+        kill(getpid(), SIGKILL);
+    }
 }

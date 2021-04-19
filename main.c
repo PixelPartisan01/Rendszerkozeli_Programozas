@@ -1,28 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
-#include <errno.h>
-#include <unistd.h>
-#include <time.h>
-#include <pwd.h>
-#include <omp.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <linux/limits.h>
-#include <arpa/inet.h>
-#include "headers/SecretMessage.h"
-
-//int BrowseForOpen();
-//char* ReadPixels(int f, int* NumCh);
-//char* Unwrap(char* Pbuff, int NumCh);
-//void Translate (char *titkos_uzenet, int NumCh);
-//void Post(char *NeptunId , char *message, int NumCh);
+#include "SecretMessage.h"
 
 int main(int argc, char* argv[])
 {
-    char *ver = "0.5.1";
+    char *ver = "1.0.0"; //0.5.3
     int NumCh = 0;
     char *titkos_uzenet = "";
     char *array = "";
@@ -41,7 +24,7 @@ int main(int argc, char* argv[])
     }
     else if(strcmp(argv[1],"--version") == 0)
     {
-        printf("version: %s\nDate: 2021.04.14\nMade by: Varadi Sandor\n",ver);
+        printf("version: %s\nDate: 2021.04.19\nMade by: Varadi Sandor\n",ver);
     }
     else if(strcmp(argv[1],"--help") == 0)
     {
