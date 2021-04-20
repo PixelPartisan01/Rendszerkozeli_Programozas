@@ -23,7 +23,6 @@
 int BrowseForOpen();
 char* ReadPixels(int f, int* NumCh);
 char* Unwrap(char* Pbuff, int NumCh);
-void Translate (char *titkos_uzenet, int NumCh);
 void Post(char *NeptunId , char *message, int NumCh);
 void WhatToDo(int sig);
 void ctrlc();
@@ -92,44 +91,17 @@ int BrowseForOpen()
             strcat(konyvtar, keres);
 
             system("clear");
-
         }
     }
-}
-
-void Translate(char* titkos_uzenet, int NumCh)
-{
-    int z = 0;
-
-    char resz_string[9];
-
-    char uzenet[NumCh + 1];
-
-    uzenet[NumCh] = '\0';
-
-    for (int i = 0; i < NumCh; i++)
-    {
-        memcpy(resz_string, &titkos_uzenet[z], 8); // Rész string
-        resz_string[8] = '\0';
-        char c = strtol(resz_string, 0, 2); // rész string (bináris kód) átalakítása karakterré
-        uzenet[i] = c;
-        z += 8;
-    }
-
-    alarm(0);
-
-    Post(NEPTUN, uzenet, NumCh);
 }
 
 char* ReadPixels(int f, int* NumCh)
 {
     char* buffer;
     long length;
-    
 
     FILE* file = fdopen(f, "rb");
-    WhatToDo(SIGALRM);
-    WhatToDo(SIGINT);
+
     alarm(1);
 
     if (!file)
@@ -191,8 +163,9 @@ char* ReadPixels(int f, int* NumCh)
 
 char* Unwrap(char* Pbuff, int NumCh)
 {
-    char* kod = (char*)malloc(NumCh * 8);
-    if (kod == NULL)
+    char *kod = (char*)malloc(NumCh * 8);
+    char *uzenet = (char*)malloc(NumCh + 1);
+    if (kod == NULL || uzenet == NULL)
     {
         printf("Memory is not allocated!\n");
         exit(1);
@@ -204,10 +177,10 @@ char* Unwrap(char* Pbuff, int NumCh)
     int rgb = 1;
 
 
-#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < 24 * NumCh; i += 8)
     {
-#pragma omp critical
+        #pragma omp critical
 
         for (int i = 0; i < 8; i++)
         {
@@ -247,12 +220,29 @@ char* Unwrap(char* Pbuff, int NumCh)
 
             rgb = 1;
         }
-
     }
 
-    free(Pbuff);
+    int z = 0;
 
-    return kod;
+    char resz_string[9];
+
+    uzenet[NumCh] = '\0';
+
+    for (int i = 0; i < NumCh; i++)
+    {
+        memcpy(resz_string, &kod[z], 8); // Rész string
+        resz_string[8] = '\0';
+        char c = strtol(resz_string, 0, 2); // Rész string (bináris kód) átalakítása karakterré
+        uzenet[i] = c;
+        z += 8;
+    }
+
+    alarm(0);
+
+    free(Pbuff);
+    free(kod);
+
+    return uzenet;
 }
 
 void Post(char* NeptunId, char* message, int NumCh)
@@ -299,6 +289,8 @@ void Post(char* NeptunId, char* message, int NumCh)
     printf("Connected.\n\n");
 
     sprintf(buffer, "POST /~vargai/post.php HTTP/1.1\r\nHost: irh.inf.unideb.hu\r\nContent-Length: %d\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\nNeptunID=%s&PostedText=%s", (NumCh + 27), NeptunId, message);
+
+    //printf("\n%s\n", buffer);
 
     bytes = send(s, buffer, strlen(buffer) + 1, flag);
 
@@ -353,7 +345,7 @@ void ctrlc()
 
     if (pid != 0)
     {
-        fprintf(stderr, "\nCTRL+C won't kill the program!\n");
-        kill(getpid(), SIGKILL);
+        fprintf(stderr, "\tCTRL+C won't kill the program!\n");
+        kill(pid, SIGKILL);
     }
 }
